@@ -1,5 +1,8 @@
 package ai.intelliaid.intelliaid_ai_backend.conversations;
 
-public record Conversation() {
+import java.util.List;
 
-}
+public record Conversation(
+		String id,
+		String profileId, 
+		List<ChatMessage> messages) {}
