@@ -23,6 +23,20 @@ public class IntelliaidAiBackendApplication implements CommandLineRunner{
 	
 	public void run(String... args) {
 		
+		profileRepository.deleteAll();
+		
+		Profile user = new Profile(
+				"user", 
+				"app_user", 
+				"local", 
+				27, 
+				Gender.MALE, 
+				"Indian", 
+				"Master", 
+				"image.url", 
+				"INTJ");
+		profileRepository.save(user);
+		
 		Profile lordCommandor = new Profile(
 				"1", 
 				"Ashwin", 
@@ -46,6 +60,7 @@ public class IntelliaidAiBackendApplication implements CommandLineRunner{
 				"image.url", 
 				"INTJ");
 		profileRepository.save(captain);
+		
 		
 		System.out.println("Master profile creation complete");
 	}
