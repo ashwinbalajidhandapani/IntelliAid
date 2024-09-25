@@ -1,10 +1,8 @@
 package ai.intelliaid.intelliaid_ai_backend.conversations;
-
+import ai.intelliaid.intelliaid_ai_backend.profiles.Profile;
+import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -19,19 +17,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+
 import ai.intelliaid.intelliaid_ai_backend.profiles.ProfileRepository;
 
 @RestController
 public class ConversationController {
-	
+	private static final String OLLAMA_URL ="http://localhost:5000";
 	private final ConversationRepository conversationRepository;
 	private final ProfileRepository profileRepository;
-	private final ChatClient chatclient;
+	private final AIModelService aiModelService;
 	
-	public ConversationController(ConversationRepository conversationRepository, ProfileRepository profileRepository, ChatClient chatclient) {
+	public ConversationController(ConversationRepository conversationRepository, ProfileRepository profileRepository, AIModelService aiModelService) {
 		this.conversationRepository = conversationRepository;
 		this.profileRepository = profileRepository;
-		this.chatclient = chatclient;
+		this.aiModelService = aiModelService;
 	}
 
 	// Creates new Conversation for the very first time
@@ -64,14 +63,8 @@ public class ConversationController {
 		// Setting time stamp for message
 		ChatMessage updatedMessage = new ChatMessage(chatMessage.messageText(), chatMessage.authorId(), chatMessage.profileId(), LocalDateTime.now());
 		conversation.messages().add(updatedMessage);
-		
-//		// Creating Prompt Template
-//		PromptTemplate promptTemplate = new PromptTemplate(chatMessage.messageText());
-//		// Creating a Prompt
-//		Prompt prompt = promptTemplate.create();
-		
-		
-		
+
+		conversation.messages().add(aiModelService.getModelResponse(chatMessage, conversation));
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(conversation);
 		
 	}
