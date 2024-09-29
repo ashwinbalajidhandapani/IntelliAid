@@ -26,40 +26,17 @@ public class IntelliaidAiBackendApplication implements CommandLineRunner{
 		profileRepository.deleteAll();
 		
 		Profile user = new Profile(
-				"user", 
+				"intelli-bot",
 				"app_user", 
 				"local", 
-				27, 
+				3000,
 				Gender.MALE, 
 				"Indian", 
 				"Master", 
 				"image.url", 
 				"INTJ");
 		profileRepository.save(user);
-		
-		Profile lordCommandor = new Profile(
-				"1", 
-				"Ashwin", 
-				"Dragon", 
-				27, 
-				Gender.MALE, 
-				"Indian", 
-				"Outdoorsy", 
-				"image.url", 
-				"INTJ");
-		profileRepository.save(lordCommandor);
-		
-		Profile captain = new Profile(
-				"2", 
-				"Sharon", 
-				"Dragon", 
-				27, 
-				Gender.FEMALE, 
-				"Indian", 
-				"Master", 
-				"image.url", 
-				"INTJ");
-		profileRepository.save(captain);
+
 		
 		
 		System.out.println("Master profile creation complete");

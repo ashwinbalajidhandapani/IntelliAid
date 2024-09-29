@@ -48,7 +48,7 @@ public class ConversationController {
 	
 	
 	// Add message in a conversation
-	@PutMapping("/conversation/coversation-id={conversationId}")
+	@PutMapping("/conversation/conversation-id={conversationId}")
 	public ResponseEntity<Conversation> addNewMessage(@PathVariable String conversationId, @RequestBody ChatMessage chatMessage){
 		// Validating if the conversation ID exisits
 		Conversation conversation = conversationRepository
@@ -57,15 +57,22 @@ public class ConversationController {
 		
 		// Validating if the author Id for message exists
 		profileRepository
-		.findById(chatMessage.authorId())
+		.findById(chatMessage.getAuthorId())
 		.orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Author ID not valid"));
 		
 		// Setting time stamp for message
-		ChatMessage updatedMessage = new ChatMessage(chatMessage.messageText(), chatMessage.authorId(), chatMessage.profileId(), LocalDateTime.now());
-		conversation.messages().add(updatedMessage);
+		ChatMessage updatedMessage = new ChatMessage(chatMessage.getMessageText(),
+				chatMessage.getAuthorId(),
+				chatMessage.getProfileId(),
+				LocalDateTime.now());
 
-		conversation.messages().add(aiModelService.getModelResponse(chatMessage, conversation));
-		return ResponseEntity.status(HttpStatus.ACCEPTED).body(conversation);
+		conversation.getMessages().add(updatedMessage);
+		conversation.getMessages().add(aiModelService.getModelResponse(chatMessage, conversation));
+		conversationRepository.save(conversation);
+		Conversation conversationResponse = conversationRepository
+				.findById(conversationId)
+				.orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation Id not valid"));
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(conversationResponse);
 		
 	}
 	
@@ -75,7 +82,7 @@ public class ConversationController {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(allConversations);
 	}
 	
-	@GetMapping("/conversation/coversation-id={conversationId}")
+	@GetMapping("/conversation/conversation-id={conversationId}")
 	public ResponseEntity<Conversation> getConversationBasedOnConversationId(@PathVariable String conversationId){
 		Conversation conversation = conversationRepository
 				.findById(conversationId)
@@ -86,4 +93,6 @@ public class ConversationController {
 	// This record is while creating a new conversation for the very first time
 	public record createConversationRequest(
 			String profileId) {}
+
+
 }
