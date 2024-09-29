@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,10 @@ import java.util.Map;
 
 @Service
 public class AIModelService {
-    private static final String OLLAMA_PORT = "11434";
+    @Value("${ollama.model}")
+    private static String MODEL_VERSION;
+    @Value("${ollama.port}")
+    private static String OLLAMA_PORT;
     private static final String OLLAMA_URL ="http://localhost:"+OLLAMA_PORT+"/api/generate";
     private final ConversationRepository conversationRepository;
     private final ProfileRepository profileRepository;
@@ -44,7 +48,7 @@ public class AIModelService {
 
         Map<String, String> promptReqBody = new HashMap<>();
         promptReqBody.put("prompt", message);
-        promptReqBody.put("model", "llama3.1");
+        promptReqBody.put("model", MODEL_VERSION);
 
         try{
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(OLLAMA_URL, promptReqBody, String.class);
