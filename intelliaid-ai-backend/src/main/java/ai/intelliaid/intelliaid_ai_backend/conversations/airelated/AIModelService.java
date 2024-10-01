@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
@@ -23,15 +24,21 @@ import java.util.Map;
 @Service
 public class AIModelService {
     @Value("${ollama.model}")
-    private static String MODEL_VERSION;
+    private String MODEL_VERSION;
     @Value("${ollama.port}")
-    private static String OLLAMA_PORT;
-    private static final String OLLAMA_URL ="http://localhost:"+OLLAMA_PORT+"/api/generate";
+    private String OLLAMA_PORT;
+    private String OLLAMA_URL;
+    @Value("${model.mode}")
+    private String MODEL_SETTINGS;
     private final ConversationRepository conversationRepository;
     private final ProfileRepository profileRepository;
     private final RestTemplate restTemplate;
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    @PostConstruct
+    public void init() {
+        OLLAMA_URL = "http://localhost:" + OLLAMA_PORT + "/api/generate";
+    }
 
     public AIModelService(ConversationRepository conversationRepository, ProfileRepository profileRepository, RestTemplate restTemplate) {
         this.conversationRepository = conversationRepository;
@@ -42,6 +49,7 @@ public class AIModelService {
 
 
     public ChatMessage getModelResponse(ChatMessage chatMessage, Conversation conversation){
+        System.out.println("Inside ai service");
         String message = chatMessage.getMessageText();
 
         ChatMessage nullResponse = new ChatMessage("Something wrong with Ollama", "intelli-bot", "intelli-bot", LocalDateTime.now());
@@ -51,6 +59,7 @@ public class AIModelService {
         promptReqBody.put("model", MODEL_VERSION);
 
         try{
+            System.out.println(OLLAMA_URL);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(OLLAMA_URL, promptReqBody, String.class);
             String[] jsonObjects = responseEntity.getBody().split("\n");
             StringBuilder sb = new StringBuilder();
@@ -75,5 +84,11 @@ public class AIModelService {
 
     }
 
+    public HashMap<String, String> getParametersBasedOnModelSettings(){
+        HashMap<String, String> parameters = new HashMap<>();
+        if(MODEL_SETTINGS.equalsIgnoreCase("casual")){
+            
+        }
+    }
 
 }
