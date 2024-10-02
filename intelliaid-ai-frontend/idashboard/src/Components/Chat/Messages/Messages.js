@@ -39,7 +39,7 @@ let parseListedItems = (text) => {
 return (
   <div className="messageWindow">
       {messages ? (
-        <div>
+        <div className="chat">
           {messages.messages.map((msg, index) => {
               let listItems = parseListedItems(msg.messageText);
               return(
