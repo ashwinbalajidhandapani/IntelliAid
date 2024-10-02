@@ -26,9 +26,9 @@ public class IntelliaidAiBackendApplication implements CommandLineRunner{
 		profileRepository.deleteAll();
 		
 		Profile user = new Profile(
+				"007",
 				"intelli-bot",
-				"app_user", 
-				"local", 
+				"1.0",
 				3000,
 				Gender.MALE, 
 				"Indian", 

@@ -1,6 +1,8 @@
-package ai.intelliaid.intelliaid_ai_backend.conversations;
+package ai.intelliaid.intelliaid_ai_backend.conversations.airelated;
 
-import ai.intelliaid.intelliaid_ai_backend.profiles.Profile;
+import ai.intelliaid.intelliaid_ai_backend.conversations.ChatMessage;
+import ai.intelliaid.intelliaid_ai_backend.conversations.Conversation;
+import ai.intelliaid.intelliaid_ai_backend.conversations.ConversationRepository;
 import ai.intelliaid.intelliaid_ai_backend.profiles.ProfileRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -8,16 +10,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public class AIModelService {
     @Value("${ollama.port}")
     private String OLLAMA_PORT;
     private String OLLAMA_URL;
-    @Value("${model.mode}")
+    @Value("${model.mode:default}")
     private String MODEL_SETTINGS;
     private final ConversationRepository conversationRepository;
     private final ProfileRepository profileRepository;
@@ -51,16 +50,14 @@ public class AIModelService {
     public ChatMessage getModelResponse(ChatMessage chatMessage, Conversation conversation){
         System.out.println("Inside ai service");
         String message = chatMessage.getMessageText();
+        ModelSettings modelSettings = new ModelSettings();
 
-        ChatMessage nullResponse = new ChatMessage("Something wrong with Ollama", "intelli-bot", "intelli-bot", LocalDateTime.now());
+        ChatMessage nullResponse = new ChatMessage("Something wrong with Ollama", "007", chatMessage.getAuthorId(), LocalDateTime.now());
 
-        Map<String, String> promptReqBody = new HashMap<>();
-        promptReqBody.put("prompt", message);
-        promptReqBody.put("model", MODEL_VERSION);
-
+        // Creating a Request Entity of Type ModelSettings
+        HttpEntity<ModelSettings> requestEntity = new HttpEntity<>(modelSettings.buildModelRequest(message, MODEL_VERSION, MODEL_SETTINGS));
         try{
-            System.out.println(OLLAMA_URL);
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(OLLAMA_URL, promptReqBody, String.class);
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(OLLAMA_URL, requestEntity, String.class);
             String[] jsonObjects = responseEntity.getBody().split("\n");
             StringBuilder sb = new StringBuilder();
             for(String s : jsonObjects){
@@ -68,7 +65,7 @@ public class AIModelService {
                 if(node.has("response")) sb.append(node.get("response").asText());
             }
 
-            ChatMessage aiResponse = new ChatMessage(sb.toString(), "1", "1", LocalDateTime.now());
+            ChatMessage aiResponse = new ChatMessage(sb.toString(), "007", chatMessage.getAuthorId(), LocalDateTime.now());
 
             return aiResponse;
         }
@@ -84,11 +81,5 @@ public class AIModelService {
 
     }
 
-    public HashMap<String, String> getParametersBasedOnModelSettings(){
-        HashMap<String, String> parameters = new HashMap<>();
-        if(MODEL_SETTINGS.equalsIgnoreCase("casual")){
-            
-        }
-    }
-
 }
+

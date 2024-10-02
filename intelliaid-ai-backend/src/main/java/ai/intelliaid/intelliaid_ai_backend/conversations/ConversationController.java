@@ -1,12 +1,9 @@
 package ai.intelliaid.intelliaid_ai_backend.conversations;
-import ai.intelliaid.intelliaid_ai_backend.profiles.Profile;
-import reactor.core.publisher.Mono;
+import ai.intelliaid.intelliaid_ai_backend.conversations.airelated.AIModelService;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +19,6 @@ import ai.intelliaid.intelliaid_ai_backend.profiles.ProfileRepository;
 
 @RestController
 public class ConversationController {
-	private static final String OLLAMA_URL ="http://localhost:5000";
 	private final ConversationRepository conversationRepository;
 	private final ProfileRepository profileRepository;
 	private final AIModelService aiModelService;
@@ -54,7 +50,7 @@ public class ConversationController {
 		Conversation conversation = conversationRepository
 				.findById(conversationId)
 				.orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation Id not valid"));
-		
+
 		// Validating if the author Id for message exists
 		profileRepository
 		.findById(chatMessage.getAuthorId())

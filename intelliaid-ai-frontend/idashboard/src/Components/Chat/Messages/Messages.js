@@ -16,34 +16,12 @@ let Message = ({ conversationId }) => {
             
             let uniqueProfileIds = [...new Set(response.data.messages.map((msg) => msg.profileId))];
             
-            // const profilePromises = uniqueProfileIds.map((profileId) =>
-            //     axios.get(`http://127.0.0.1:8080/profile/id=${encodeURIComponent(profileId)}`)
-            //     .then((response) => ({profileId, data: response.data}))
-            //     .catch((error) => {
-            //         console.log(`Error fetching profile for profileId ${profileId}:`, error);
-            //         return {profileId, data: null};
-            //     })
-            // );
-
-            const profileResponse = {};
-            for(let i = 0; i < uniqueProfileIds.length; i++){
-                let resp = await axios.get('http://127.0.0.1:8080/profile/id='+uniqueProfileIds[i]);
-                profileResponse[i] = resp;
+            const profileData = {};
+            for(let id of uniqueProfileIds){
+                console.log(`http://127.0.0.1:8080/profile/id=${id}`);
+                let profileIdsResponse = await axios.get(`http://127.0.0.1:8080/profile/id=${id}`);
+                profileData[id] = profileIdsResponse.data;
             }
-            
-            // let profileResponses = await Promise.allSettled(profilePromises);
-
-            let profileData = {};
-
-            profileResponse.forEach((profileResponse, index) => {
-                const profileId = profileResponse.profileId;
-                if(profileResponse.data){
-                    profileData[profileId] = profileResponse.data;
-                }
-                else{
-                    console.log("Not Found");
-                }
-            });
             setProfiles(profileData);
             console.log(profileData);
         }
@@ -54,23 +32,56 @@ let Message = ({ conversationId }) => {
     getMessages();
 }, [conversationId]);
 
+let parseListedItems = (text) => {
+    return text.split('*').map((i)=> i.trim()).filter((i) => i.length > 0);
+};
+
 return (
   <div className="messageWindow">
       {messages ? (
         <div>
-          {messages.messages.map((msg, index) => (
-            <p key={index}>
-                <strong>
-                    {profiles[msg.profileId]?.firstName || profiles[msg.profileId]?.lastName || "Loading..."}
-                </strong>
-            : {msg.messageText}</p>
-          ))}
-        </div>
+          {messages.messages.map((msg, index) => {
+              let listItems = parseListedItems(msg.messageText);
+              return(
+                  <div key = {index}>
+                    <strong>
+                        {profiles[msg.profileId]?.firstName || "Loading..."}
+                    </strong>
+                    {listItems.length > 1 ? (
+                        <div>
+                            <p>{listItems[0]}</p>
+                            {listItems.length > 1 && (
+                                <ul>
+                                    {listItems.slice(1).map((i, index) => (
+                                        <li key={index}>
+                                            {i.split('\n').map((text, j) => (
+                                                <span key={j}>
+                                                    {text}
+                                                    <br/>
+                                                </span>
+                                            ))}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    ) : (
+                        <p>
+                            {msg.messageText.split('\n').map((text, index) => (
+                            <span key={index}>
+                                {text}
+                                <br />
+                            </span>
+                        ))}
+                        </p>
+                    )}
+                </div>);
+          })}
+          </div>
       ) : (
-        <p>Loading messages...</p>
+          <p>Loading Messages</p>
       )}
-  </div>
-);
+      </div>);
 }
 
 export default Message;
