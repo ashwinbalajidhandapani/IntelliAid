@@ -27,5 +27,5 @@ Run ChatGPT like chatbot in your machine!
 - cd to project folder (Intelliaid-frontend folder), npm start
     
 ## API Doc (Backend):
-    [API Docs](https://github.com/ashwinbalajidhandapani/IntelliAid/blob/main/api-docs.json)
+[API Docs](https://github.com/ashwinbalajidhandapani/IntelliAid/blob/main/api-docs.json)
 
