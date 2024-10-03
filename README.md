@@ -11,11 +11,11 @@ Run ChatGPT like chatbot on your machine!
     - knowledgeable - For questions
 
 ## Work in Progress
-- ** Current
+- **Current
     - Revamped profile features and conversation history features 
     - Front-end features
     - Material-UI
-- ** Future Enhancements
+- **Future Enhancements
     - Explore microservice implementation
     - Explore other model implementations (like ChatGPT)
     - model fine-tune for integration capabilities
