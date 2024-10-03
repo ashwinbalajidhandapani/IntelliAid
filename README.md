@@ -1,19 +1,26 @@
 # IntelliAid
 
-Run ChatGPT like chatbot in your machine!
+Run ChatGPT like chatbot on your machine!
 
 ## Current Features:
-    - Chat with Ollama (version 0.3.6)
-    - Create Profiles
-    - Create Seperate Conversations
-    - Model works in two modes
-        - Casual - For conversations
-        - knowledgeable - For questions
+- Chat with Ollama (version 0.3.6)
+- Create Profiles
+- Create Separate Conversations
+- Model works in two modes
+    - Casual - For conversations
+    - knowledgeable - For questions
 
 ## Work in Progress
-    - Model Fine tuning
+- ** Current **
+    - Revamped profile features and conversation history features 
     - Front-end features
-
+    - Material-UI
+- ** Future Enhancements **
+    - Explore microservice implementation
+    - Explore other model implementations (like ChatGPT)
+    - model fine-tune for integration capabilities
+        - For secure code review feedback system
+          
 ## Installation Prerequesites:
 - Java 8 or above
 - Maven (Latest version)
